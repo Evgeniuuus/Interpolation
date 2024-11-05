@@ -140,6 +140,7 @@ y_func = math.cos(math.sin(tochka) ** 2)
 
 print("Координаты точки равны :  (", tochka, " ; ", y_func, ")")
 print("R2_x = ", R2_x)
+print("epsilon = ", epsilon)
 print("Координаты искомой точки равны :  (", tochka, " ; ", Iskomaya_tochka, ")")
 
 figura.legend()

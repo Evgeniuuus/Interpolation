@@ -4,7 +4,7 @@ import sympy as sympy
 import math
 
 function = "sin(x)^2 * cos(x+1)"    # Исходная функция
-n = 20                              # Количество интервалов, а количество точек то как раз n+1
+n = 10                              # Количество интервалов, а количество точек то как раз n+1
 a = 0                               # Границы
 b = 10
 h = (b - a) / n                     # Шаг
@@ -122,7 +122,33 @@ plt.show()
 
 # ==============================Кубический сплайн============================================
 def Splain_3(mas1, mas2):
-    pass
+    p_i = 0
+    q_i = 0
+    p = [p_i]
+    q = [q_i]
+
+    for i in range(1, n):
+        h_poli = x_node[i] - x_node[i-1]      # Так как у нас равномерная сетка то hi = hi+1
+        alpha = h_poli
+        beta = 2 * (h_poli + h_poli)
+        gamma = h_poli
+        phi = 6 * ((y_node[i+1] - y_node[i])/h_poli - (y_node[i] - y_node[i-1])/h_poli)
+
+        p_i_1 = (-1) * (gamma / (beta + alpha * p_i))
+        q_i_1 = (phi * alpha * q_i) / (beta + alpha * p_i)
+
+        p.append(p_i_1)
+        q.append(q_i_1)
+
+        p_i = p_i_1
+        q_i = q_i_1
+
+    print(p)
+    print(q)
+
+
+
+    return mas1, mas2
 
 
 plt.subplot(121)  # Левое окно для графиков

@@ -4,7 +4,7 @@ import sympy as sympy
 import math
 
 function = "sin(x)^2 * cos(x+1)"    # Исходная функция
-n = 10                              # Количество интервалов, а количество точек то как раз n+1
+n = 20                              # Количество интервалов, а количество точек то как раз n+1
 a = 0                               # Границы
 b = 10
 h = (b - a) / n                     # Шаг
@@ -127,26 +127,47 @@ def Splain_3(mas1, mas2):
     p = [p_i]
     q = [q_i]
 
+    alpha = []
+    beta = []
+    gamma = []
+    phi = []
+
     for i in range(1, n):
         h_poli = x_node[i] - x_node[i-1]      # Так как у нас равномерная сетка то hi = hi+1
-        alpha = h_poli
-        beta = 2 * (h_poli + h_poli)
-        gamma = h_poli
-        phi = 6 * ((y_node[i+1] - y_node[i])/h_poli - (y_node[i] - y_node[i-1])/h_poli)
+        alpha_poli = h_poli
+        beta_poli = 2 * (h_poli + h_poli)
+        gamma_poli = h_poli
+        phi_poli = 6 * ((y_node[i+1] - y_node[i])/h_poli - (y_node[i] - y_node[i-1])/h_poli)
 
-        p_i_1 = (-1) * (gamma / (beta + alpha * p_i))
-        q_i_1 = (phi * alpha * q_i) / (beta + alpha * p_i)
+        p_i_1 = (-1) * (gamma_poli / (beta_poli + alpha_poli * p_i))
+        q_i_1 = (phi_poli - alpha_poli * q_i) / (beta_poli + alpha_poli * p_i)
 
         p.append(p_i_1)
         q.append(q_i_1)
 
+        alpha.append(alpha_poli)
+        beta.append(beta_poli)
+        gamma.append(gamma_poli)
+        phi.append(phi_poli)
+
         p_i = p_i_1
         q_i = q_i_1
 
+    c_i_1 = 0
+    c = []
+    for i in range(n - 1, -1, -1):
+        c_i = p[i] * c_i_1 + q[i]
+        c.append(c_i)
+        c_i_1 = c_i
+
+    # print(c)
     print(p)
     print(q)
 
-
+    #print(alpha)
+    #print(beta)
+    #print(gamma)
+    #print(phi)
 
     return mas1, mas2
 
@@ -165,7 +186,7 @@ Splain_3(x_polinomial_collect, y_polynomial_collect)  # Заполнили
 plt.plot(x_polinomial_collect, y_polynomial_collect, '--', color="green", label="Интерполяция")
 plt.legend()
 
-
+'''
 # ------------------------------Практическая погрешность---------------------------------------
 
 # absolute_error = [abs(y[i] - y_polynomial_collect[i]) for i in range(len(x))]
@@ -179,3 +200,4 @@ plt.text(0, 0, error, fontsize=10, bbox={'facecolor': 'yellow'})
 plt.grid()
 plt.legend()
 plt.show()
+'''

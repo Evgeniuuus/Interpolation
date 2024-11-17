@@ -3,15 +3,20 @@ import matplotlib.pyplot as plt
 import sympy as sympy
 import math
 
-function = "sin(x)^2 * cos(x+1)"    # Исходная функция
-n = 20                              # Количество интервалов, а количество точек то как раз n+1
-a = 0                               # Границы
-b = 10
-h = (b - a) / n                     # Шаг
-quantity_points = 1000              # Количество точек для отрисовки графиков
+function = "sin(x)^2 * cos(x+1)"  # Исходная функция
+n = 20  # Количество интервалов, а количество точек то как раз n+1
+a = 0  # Границы
+b = 5
+h = (b - a) / n  # Шаг
+quantity_points = 1000  # Количество точек для отрисовки графиков
 
 x = numpy.linspace(a, b, quantity_points)  # Массивы для исходного графика
 y = numpy.sin(x) ** 2 * numpy.cos(x + 1)
+
+x_node = [a]  # Находим значения узлов в равномерной сетке
+for i in range(n):  # Они будут нужны для построения полиномов
+    x_node.append(x_node[i] + h)
+y_node = [math.sin(x_node[i]) ** 2 * math.cos(x_node[i] + 1) for i in range(len(x_node))]
 
 
 # ==================================Линейный сплайн============================================
@@ -38,11 +43,6 @@ plt.subplot(121)  # Левое окно для графиков
 plt.title('Линейный сплайн', fontsize=14, fontname='Times New Roman')
 plt.plot(x, y, color="red", label=str(function))
 plt.grid()
-
-x_node = [a]                                # Находим значения узлов в равномерной сетке
-for i in range(n):                          # Они будут нужны для построения полиномов
-    x_node.append(x_node[i] + h)
-y_node = [math.sin(x_node[i]) ** 2 * math.cos(x_node[i] + 1) for i in range(len(x_node))]
 
 x_polinomial_collect = []                   # Массивы для построения интерполяции
 y_polynomial_collect = []
@@ -122,52 +122,76 @@ plt.show()
 
 # ==============================Кубический сплайн============================================
 def Splain_3(mas1, mas2):
-    p_i = 0
+    p_i = 0  # самые первые p и q у нас нулевые (по условию)
     q_i = 0
     p = [p_i]
     q = [q_i]
-
+    # h задавали в самом начале
+    h_poli = h  # Так как у нас равномерная сетка, то hi = hi+1
     alpha = []
     beta = []
     gamma = []
     phi = []
-
-    for i in range(1, n):
-        h_poli = x_node[i] - x_node[i-1]      # Так как у нас равномерная сетка то hi = hi+1
+    # цикл делает до n не включая конец
+    for i in range(1, n):  # Считаем коэффициенты альфа бета гамма фи внутри промежутка. => Их будет n-1
         alpha_poli = h_poli
         beta_poli = 2 * (h_poli + h_poli)
         gamma_poli = h_poli
-        phi_poli = 6 * ((y_node[i+1] - y_node[i])/h_poli - (y_node[i] - y_node[i-1])/h_poli)
+        phi_poli = 6 * ((y_node[i + 1] - y_node[i]) / h_poli - (y_node[i] - y_node[i - 1]) / h_poli)
 
+        # Считаем коэффициенты p и q которые внутри
         p_i_1 = (-1) * (gamma_poli / (beta_poli + alpha_poli * p_i))
         q_i_1 = (phi_poli - alpha_poli * q_i) / (beta_poli + alpha_poli * p_i)
 
         p.append(p_i_1)
         q.append(q_i_1)
 
-        alpha.append(alpha_poli)
-        beta.append(beta_poli)
-        gamma.append(gamma_poli)
-        phi.append(phi_poli)
-
         p_i = p_i_1
         q_i = q_i_1
 
-    c_i_1 = 0
-    c = []
-    for i in range(n - 1, -1, -1):
-        c_i = p[i] * c_i_1 + q[i]
+        # Соответственно количество коэффициентов p и q будет n (начальные и то что внутри)
+    print("p = ", p)
+    print("q = ", q)
+
+    c_n = 0  # тобишь самая последняя c
+    c = [c_n]
+    for i in range(n - 1, 0, -1):  # до 0-го элемента не включая конец
+        c_i = p[i] * c[n - i - 1] + q[i]
         c.append(c_i)
-        c_i_1 = c_i
+    c += [0]  # самое первое c (тоже по условию)
+    c.reverse()
+    # Всего коэффициентов c будет n+1 (столько же сколько точек)
+    print("c = ", c)
 
-    # print(c)
-    print(p)
-    print(q)
+    d = []
+    for i in range(0, n):
+        d.append((c[i] - c[i + 1]) / h_poli)
 
-    #print(alpha)
-    #print(beta)
-    #print(gamma)
-    #print(phi)
+    b = []
+    for i in range(0, n):
+        b_i = (y_node[i] - y_node[i + 1]) / h_poli - (c[i + 1] * h_poli) / 2 - ((c[i] - c[i + 1]) * h_poli) / 6
+        b.append(b_i)
+
+    a = []
+    for i in range(0, n):
+        a.append(y_node[i])
+        # Коэффициентов d, b и a должно быть n (столько же сколько сплайнов, что логично)
+    print("d = ", d)
+    print("b = ", b)
+    print("a = ", a)
+
+    for i in range(0, n):
+        x_line = numpy.linspace(x_node[i], x_node[i + 1], int(quantity_points / n))
+        mas1.extend(x_line)
+
+        S_i = ""
+        S_i += str(a[i]) + " + " + str(b[i]) + "*(" + str(x_node[i]) + "-x) + "
+        S_i += "1/2*" + str(c[i+1]) + "*(" + str(x_node[i]) + "-x)^2 + "
+        S_i += "1/6 * " + str(d[i]) + "*(" + str(x_node[i]) + "-x)^3"
+
+        Splain = sympy.poly(S_i)
+        print(Splain)
+        mas2 += [Splain.subs(sympy.Symbol('x'), x_line[i]) for i in range(len(x_line))]
 
     return mas1, mas2
 
@@ -177,8 +201,7 @@ plt.title('Кубический сплайн', fontsize=14, fontname='Times New 
 plt.plot(x, y, color="red", label=str(function))
 plt.grid()
 
-
-x_polinomial_collect = []                   # Массивы для построения интерполяции
+x_polinomial_collect = []  # Массивы для построения интерполяции
 y_polynomial_collect = []
 
 Splain_3(x_polinomial_collect, y_polynomial_collect)  # Заполнили
@@ -186,18 +209,16 @@ Splain_3(x_polinomial_collect, y_polynomial_collect)  # Заполнили
 plt.plot(x_polinomial_collect, y_polynomial_collect, '--', color="green", label="Интерполяция")
 plt.legend()
 
-'''
 # ------------------------------Практическая погрешность---------------------------------------
 
-# absolute_error = [abs(y[i] - y_polynomial_collect[i]) for i in range(len(x))]
+absolute_error = [abs(y[i] - y_polynomial_collect[i]) for i in range(len(x))]
 error = "max = " + str(max(absolute_error))
 
 plt.subplot(122)
 plt.title('Погрешность', fontsize=14, fontname='Times New Roman')
-# plt.plot(x_polinomial_collect, absolute_error, '--', color="magenta", label="Абсолютная")
+plt.plot(x_polinomial_collect, absolute_error, '--', color="magenta", label="Абсолютная")
 plt.text(0, 0, error, fontsize=10, bbox={'facecolor': 'yellow'})
 
 plt.grid()
 plt.legend()
 plt.show()
-'''

@@ -4,7 +4,7 @@ import sympy as sympy
 import math
 
 function = "sin(x)^2 * cos(x+1)"  # Исходная функция
-n = 20  # Количество интервалов, а количество точек то как раз n+1
+n = 10  # Количество интервалов, а количество точек то как раз n+1
 a = 0  # Границы
 b = 5
 h = (b - a) / n  # Шаг
@@ -186,10 +186,11 @@ def Splain_3(mas1, mas2):
 
         S_i = ""
         S_i += str(a[i]) + " + " + str(b[i]) + "*(" + str(x_node[i]) + "-x) + "
-        S_i += "1/2*" + str(c[i+1]) + "*(" + str(x_node[i]) + "-x)^2 + "
-        S_i += "1/6 * " + str(d[i]) + "*(" + str(x_node[i]) + "-x)^3"
+        S_i += "1/2 * " + str(-c[i+1]) + "*(" + str(x_node[i]) + "-x)**2 + "
+        S_i += "1/6 * " + str(d[i]) + "*(" + str(x_node[i]) + "-x)**3"
 
         Splain = sympy.poly(S_i)
+        print(S_i)
         print(Splain)
         mas2 += [Splain.subs(sympy.Symbol('x'), x_line[i]) for i in range(len(x_line))]
 

@@ -3,18 +3,18 @@ import matplotlib.pyplot as plt
 import sympy as sympy
 import math
 
-function = "sin(x)^2 * cos(x+1)"  # Исходная функция
-n = 10  # Количество интервалов, а количество точек то как раз n+1
-a = 0  # Границы
-b = 5
-h = (b - a) / n  # Шаг
-quantity_points = 1000  # Количество точек для отрисовки графиков
+function = "sin(x)^2 * cos(x+1)"                            # Исходная функция
+n = 20                                                     # Количество интервалов, а количество точек то как раз n+1
+a = 0                                                       # Границы
+b = 10
+h = (b - a) / n                                             # Шаг
+quantity_points = 1000                                      # Количество точек для отрисовки графиков
 
-x = numpy.linspace(a, b, quantity_points)  # Массивы для исходного графика
+x = numpy.linspace(a, b, quantity_points)                   # Массивы для исходного графика
 y = numpy.sin(x) ** 2 * numpy.cos(x + 1)
 
-x_node = [a]  # Находим значения узлов в равномерной сетке
-for i in range(n):  # Они будут нужны для построения полиномов
+x_node = [a]                                                # Находим значения узлов в равномерной сетке
+for i in range(n):                                          # Они будут нужны для построения полиномов
     x_node.append(x_node[i] + h)
 y_node = [math.sin(x_node[i]) ** 2 * math.cos(x_node[i] + 1) for i in range(len(x_node))]
 
@@ -25,7 +25,7 @@ def Splain_1(mas1, mas2):
         x_line = numpy.linspace(x_node[i - 1], x_node[i], int(quantity_points / n))  # От узла до узла
         mas1.extend(x_line)
 
-        S_i = ""  # Вычисляем коэффициенты полинома
+        S_i = ""                                                    # Вычисляем коэффициенты полинома
         a_poli = y_node[i]
         h_poli = x_node[i] - x_node[i - 1]
         b_poli = (y_node[i - 1] - y_node[i]) / h_poli
@@ -39,15 +39,15 @@ def Splain_1(mas1, mas2):
     return mas1, mas2
 
 
-plt.subplot(121)  # Левое окно для графиков
+plt.subplot(121)                                                    # Левое окно для графиков
 plt.title('Линейный сплайн', fontsize=14, fontname='Times New Roman')
 plt.plot(x, y, color="red", label=str(function))
 plt.grid()
 
-x_polinomial_collect = []                   # Массивы для построения интерполяции
+x_polinomial_collect = []                                           # Массивы для построения интерполяции
 y_polynomial_collect = []
 
-Splain_1(x_polinomial_collect, y_polynomial_collect)  # Заполнили
+Splain_1(x_polinomial_collect, y_polynomial_collect)                # Заполнили
 
 plt.plot(x_polinomial_collect, y_polynomial_collect, '--', color="green", label="Интерполяция")
 plt.legend()
@@ -92,15 +92,15 @@ def Splain_2(mas1, mas2):
     return mas1, mas2
 
 
-plt.subplot(121)  # Левое окно для графиков
+plt.subplot(121)                                                    # Левое окно для графиков
 plt.title('Параболический сплайн', fontsize=14, fontname='Times New Roman')
 plt.plot(x, y, color="red", label=str(function))
 plt.grid()
 
-x_polinomial_collect = []                   # Массивы для построения интерполяции
+x_polinomial_collect = []                                           # Массивы для построения интерполяции
 y_polynomial_collect = []
 
-Splain_2(x_polinomial_collect, y_polynomial_collect)  # Заполнили
+Splain_2(x_polinomial_collect, y_polynomial_collect)                # Заполнили
 
 plt.plot(x_polinomial_collect, y_polynomial_collect, '--', color="black", label="Интерполяция")
 plt.legend()
@@ -119,19 +119,15 @@ plt.grid()
 plt.legend()
 plt.show()
 
-
 # ==============================Кубический сплайн============================================
 def Splain_3(mas1, mas2):
-    p_i = 0  # самые первые p и q у нас нулевые (по условию)
+    p_i = 0                                 # самые первые p и q у нас нулевые (по условию)
     q_i = 0
     p = [p_i]
     q = [q_i]
-    # h задавали в самом начале
-    h_poli = h  # Так как у нас равномерная сетка, то hi = hi+1
-    alpha = []
-    beta = []
-    gamma = []
-    phi = []
+                                            # h задавали в самом начале
+    h_poli = h                              # Так как у нас равномерная сетка, то hi = hi+1
+
     # цикл делает до n не включая конец
     for i in range(1, n):  # Считаем коэффициенты альфа бета гамма фи внутри промежутка. => Их будет n-1
         alpha_poli = h_poli
@@ -149,19 +145,16 @@ def Splain_3(mas1, mas2):
         p_i = p_i_1
         q_i = q_i_1
 
-        # Соответственно количество коэффициентов p и q будет n (начальные и то что внутри)
-    print("p = ", p)
-    print("q = ", q)
+    # Соответственно количество коэффициентов p и q будет n (начальные и то что внутри)
 
-    c_n = 0  # тобишь самая последняя c
+    c_n = 0                                         # тобишь самая последняя c
     c = [c_n]
-    for i in range(n - 1, 0, -1):  # до 0-го элемента не включая конец
+    for i in range(n - 1, 0, -1):                   # до 0-го элемента не включая конец
         c_i = p[i] * c[n - i - 1] + q[i]
         c.append(c_i)
-    c += [0]  # самое первое c (тоже по условию)
+    c += [0]                                        # самое первое c (тоже по условию)
     c.reverse()
     # Всего коэффициентов c будет n+1 (столько же сколько точек)
-    print("c = ", c)
 
     d = []
     for i in range(0, n):
@@ -169,25 +162,27 @@ def Splain_3(mas1, mas2):
 
     b = []
     for i in range(0, n):
-        b_i = (y_node[i] - y_node[i + 1]) / h_poli - (c[i + 1] * h_poli) / 2 - ((c[i] - c[i + 1]) * h_poli) / 6
+        b_i = (y_node[i] - y_node[i + 1]) / h_poli - (c[i + 1] * h_poli)/2 - ((c[i] - c[i + 1]) * h_poli)/6
         b.append(b_i)
 
     a = []
-    for i in range(0, n):
+    for i in range(0, n+1):                         # Коэфициенты a возьмем с запасом от ноля
         a.append(y_node[i])
-        # Коэффициентов d, b и a должно быть n (столько же сколько сплайнов, что логично)
+
+    # Коэффициентов d, b должно быть n (столько же сколько сплайнов, что логично)
     print("d = ", d)
     print("b = ", b)
     print("a = ", a)
-
+    print("x_node = ", x_node)
+    print("y_node = ", y_node)
     for i in range(0, n):
         x_line = numpy.linspace(x_node[i], x_node[i + 1], int(quantity_points / n))
         mas1.extend(x_line)
-
-        S_i = ""
-        S_i += str(a[i]) + " + " + str(b[i]) + "*(" + str(x_node[i]) + "-x) + "
-        S_i += "1/2 * " + str(-c[i+1]) + "*(" + str(x_node[i]) + "-x)**2 + "
-        S_i += "1/6 * " + str(d[i]) + "*(" + str(x_node[i]) + "-x)**3"
+                                                                # Очень вниматошно смотрим на коэффициенты
+        S_i = ""                                                # И правильно строим сплайн
+        S_i += str(a[i+1]) + " + " + str(b[i]) + "*(" + str(x_node[i+1]) + "-x) + "
+        S_i += "1/2 * " + str(c[i+1]) + "*(" + str(x_node[i+1]) + "-x)**2 + "
+        S_i += "1/6 * " + str(d[i]) + "*(" + str(x_node[i+1]) + "-x)**3"
 
         Splain = sympy.poly(S_i)
         print(S_i)
@@ -202,10 +197,10 @@ plt.title('Кубический сплайн', fontsize=14, fontname='Times New 
 plt.plot(x, y, color="red", label=str(function))
 plt.grid()
 
-x_polinomial_collect = []  # Массивы для построения интерполяции
+x_polinomial_collect = []                                                   # Массивы для построения интерполяции
 y_polynomial_collect = []
 
-Splain_3(x_polinomial_collect, y_polynomial_collect)  # Заполнили
+Splain_3(x_polinomial_collect, y_polynomial_collect)                        # Заполнили
 
 plt.plot(x_polinomial_collect, y_polynomial_collect, '--', color="green", label="Интерполяция")
 plt.legend()
